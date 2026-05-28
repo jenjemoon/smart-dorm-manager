@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
+// 방금 수정 완료 테스트
   String _formatStatus(String status) {
     switch (status) {
       case 'COMPLETED':
