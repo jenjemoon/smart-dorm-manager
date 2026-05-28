@@ -8,15 +8,19 @@ class RefrigeratorHomePage extends StatelessWidget {
   String _formatStatus(String status) {
     switch (status) {
       case 'ACTIVE':
-        return '보관 중';
+        return '보관중';
+
       case 'EXPIRED':
-        return '만료';
+        return '기간만료';
+
       case 'REMOVED':
-        return '제거됨';
+        return '사용자 제거';
+
       case 'DISCARDED':
-        return '폐기됨';
+        return '관리자 폐기';
+
       default:
-        return '상태 없음';
+        return '';
     }
   }
 
