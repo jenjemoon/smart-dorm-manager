@@ -220,7 +220,52 @@ class HomePage extends StatelessWidget {
               onTap: () {},
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            '실행할 기능을 선택해주세요',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ListTile(
+                            leading: const Icon(Icons.qr_code_scanner),
+                            title: const Text('QR 스캔'),
+                            subtitle: const Text('세탁기/건조기 사용 시작'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/qrScan');
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt_outlined),
+                            title: const Text('사진 촬영'),
+                            subtitle: const Text('냉장고 식품 등록'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/camera');
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
               child: Container(
                 width: 84,
                 height: 84,
@@ -232,13 +277,13 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(
-                      Icons.qr_code_scanner,
+                      Icons.camera_alt_outlined,
                       size: 36,
                       color: Colors.black54,
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'QR 스캔',
+                      '카메라',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
