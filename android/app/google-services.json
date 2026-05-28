@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1044048419847",
+    "project_id": "handong-dorm-manager",
+    "storage_bucket": "handong-dorm-manager.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1044048419847:android:1608d4d7a402695e965ea2",
+        "android_client_info": {
+          "package_name": "com.example.shrine"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1044048419847-nfq54lsk2ugq5nt6shsbe433jc6bm9aq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQrqFEH_50zeXZdzgwQ73eTl3QmtHJjy8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1044048419847-nfq54lsk2ugq5nt6shsbe433jc6bm9aq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
