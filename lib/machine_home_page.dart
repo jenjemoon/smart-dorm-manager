@@ -155,11 +155,23 @@ class _MachineHomePageState extends State<MachineHomePage> {
                           final remainingTime =
                               data['remainingTime'] ?? '00:00';
 
-                          return _machineCard(
-                            machineNo: machineNo.toString(),
-                            status: status,
-                            location: location,
-                            remainingTime: remainingTime,
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/machineDetail',
+                                arguments: {
+                                  'machineId': doc.id,
+                                  'machineType': data['machineType'],
+                                },
+                              );
+                            },
+                            child: _machineCard(
+                              machineNo: machineNo.toString(),
+                              status: status,
+                              location: location,
+                              remainingTime: remainingTime,
+                            ),
                           );
                         }).toList(),
                       ),
