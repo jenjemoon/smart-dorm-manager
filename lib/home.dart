@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
+// 방금 수정 완료 테스트
   String _formatStatus(String status) {
     switch (status) {
       case 'COMPLETED':
@@ -107,10 +107,15 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      _categoryCard(
-                        color: const Color(0xFF9BC3FF),
-                        icon: Icons.local_laundry_service_outlined,
-                        title: '세탁',
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/machineHome');
+                        },
+                        child: _categoryCard(
+                          color: const Color(0xFF9BC3FF),
+                          icon: Icons.local_laundry_service_outlined,
+                          title: '세탁',
+                        ),
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
