@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1044048419847-8u8q7fgv1sgrv530qr2fqgi6ovio9jhn.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1044048419847-8u8q7fgv1sgrv530qr2fqgi6ovio9jhn</string>
+	<key>API_KEY</key>
+	<string>AIzaSyClOcG0h4bkOgA5KH6J4fzHe7CmLyfiN8w</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1044048419847</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.mdc100Series</string>
+	<key>PROJECT_ID</key>
+	<string>handong-dorm-manager</string>
+	<key>STORAGE_BUCKET</key>
+	<string>handong-dorm-manager.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1044048419847:ios:08cf42229a6e4510965ea2</string>
+</dict>
+</plist>

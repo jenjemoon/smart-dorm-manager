@@ -8,9 +8,11 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.17.0
-
+  firebase_auth: ^6.0.1
+  google_sign_in: ^6.2.1
   cupertino_icons: ^1.0.5
   shrine_images: ^2.0.2
+  cloud_firestore: ^6.0.0
 
 dev_dependencies:
   flutter_test:
