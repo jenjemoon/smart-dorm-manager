@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'login.dart';
 import 'profile_setup_page.dart';
+import 'refrigerator_home_page.dart';
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class ShrineApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
         '/profileSetup': (context) => const ProfileSetupPage(),
+        '/refrigeratorHome': (context) => const RefrigeratorHomePage(),
       },
     );
   }

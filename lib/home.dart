@@ -113,10 +113,15 @@ class HomePage extends StatelessWidget {
                         title: '세탁',
                       ),
                       const SizedBox(height: 16),
-                      _categoryCard(
-                        color: const Color(0xFFFFD83D),
-                        icon: Icons.kitchen_outlined,
-                        title: '냉장고',
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/refrigeratorHome');
+                        },
+                        child: _categoryCard(
+                          color: const Color(0xFFFFD83D),
+                          icon: Icons.kitchen_outlined,
+                          title: '냉장고',
+                        ),
                       ),
                       const SizedBox(height: 16),
                       _categoryCard(
