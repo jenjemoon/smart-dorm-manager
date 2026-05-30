@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
+// 방금 수정 완료 테스트 (혜연)
   String _formatStatus(String status) {
     switch (status) {
       case 'COMPLETED':
@@ -107,10 +107,15 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      _categoryCard(
-                        color: const Color(0xFF9BC3FF),
-                        icon: Icons.local_laundry_service_outlined,
-                        title: '세탁',
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/machineHome');
+                        },
+                        child: _categoryCard(
+                          color: const Color(0xFF9BC3FF),
+                          icon: Icons.local_laundry_service_outlined,
+                          title: '세탁',
+                        ),
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
@@ -215,7 +220,52 @@ class HomePage extends StatelessWidget {
               onTap: () {},
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                  ),
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            '실행할 기능을 선택해주세요',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ListTile(
+                            leading: const Icon(Icons.qr_code_scanner),
+                            title: const Text('QR 스캔'),
+                            subtitle: const Text('세탁기/건조기 사용 시작'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/qrScan');
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt_outlined),
+                            title: const Text('사진 촬영'),
+                            subtitle: const Text('냉장고 식품 등록'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/camera');
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
               child: Container(
                 width: 84,
                 height: 84,
@@ -227,13 +277,13 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Icon(
-                      Icons.qr_code_scanner,
+                      Icons.camera_alt_outlined,
                       size: 36,
                       color: Colors.black54,
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'QR 스캔',
+                      '카메라',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),
