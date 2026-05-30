@@ -72,7 +72,7 @@ class MachineDetailPage extends StatelessWidget {
                 else if (isMine)
                   _myUsingButtons()
                 else
-                  _otherUsingButtons(machineId),
+                  _otherUsingButtons(context, machineId),
                 const SizedBox(height: 28),
                 const Text(
                   '메시지',
@@ -239,22 +239,64 @@ class MachineDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _otherUsingButtons(String machineId) {
-    return Row(
-      children: [
-        Expanded(
-          child: _actionButton(
-            icon: Icons.people_alt_outlined,
-            title: '줄서기',
-            isDark: false,
-            onTap: () {},
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _queueInfo(machineId),
-        ),
-      ],
+  Widget _otherUsingButtons(BuildContext context, String machineId) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('machineQueues')
+          .where('machineId', isEqualTo: machineId)
+          .where('status', isEqualTo: 'WAITING')
+          .orderBy('createdAt')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          print('queue error: ${snapshot.error}');
+          return const Text('대기 정보를 불러올 수 없습니다.');
+        }
+
+        final docs = snapshot.data?.docs ?? [];
+
+        int myOrder = 0;
+
+        if (uid != null) {
+          final index = docs.indexWhere((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return data['userId'] == uid;
+          });
+
+          if (index != -1) {
+            myOrder = index + 1;
+          }
+        }
+
+        final bool isQueued = myOrder != 0;
+
+        return Row(
+          children: [
+            Expanded(
+              child: _actionButton(
+                icon: isQueued
+                    ? Icons.hourglass_bottom
+                    : Icons.people_alt_outlined,
+                title: isQueued ? '대기중\n${myOrder}번째' : '줄서기',
+                isDark: isQueued,
+                onTap: () {
+                  if (isQueued) {
+                    _cancelQueue(context, machineId);
+                  } else {
+                    _joinQueue(context, machineId);
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _queueInfo(machineId),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -263,16 +305,22 @@ class MachineDetailPage extends StatelessWidget {
       stream: FirebaseFirestore.instance
           .collection('machineQueues')
           .where('machineId', isEqualTo: machineId)
+          .where('status', isEqualTo: 'WAITING')
           .orderBy('createdAt')
           .snapshots(),
       builder: (context, snapshot) {
-        final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
+        if (snapshot.hasError) {
+          print('queue error: ${snapshot.error}');
+          return const Text('대기 정보를 불러올 수 없습니다.');
+        }
 
-        int myOrder = 0;
+        final docs = snapshot.data?.docs ?? [];
+        final count = docs.length;
+
         final uid = FirebaseAuth.instance.currentUser?.uid;
+        int myOrder = 0;
 
-        if (snapshot.hasData && uid != null) {
-          final docs = snapshot.data!.docs;
+        if (uid != null) {
           final index = docs.indexWhere((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return data['userId'] == uid;
@@ -364,6 +412,62 @@ class MachineDetailPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _joinQueue(BuildContext context, String machineId) async {
+    print('줄서기 저장 machineId: $machineId');
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final existing = await FirebaseFirestore.instance
+        .collection('machineQueues')
+        .where('machineId', isEqualTo: machineId)
+        .where('userId', isEqualTo: user.uid)
+        .where('status', isEqualTo: 'WAITING')
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이미 줄서기 중입니다.')),
+      );
+      return;
+    }
+
+    await FirebaseFirestore.instance.collection('machineQueues').add({
+      'machineId': machineId,
+      'userId': user.uid,
+      'status': 'WAITING',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('줄서기가 완료되었습니다.')),
+    );
+  }
+
+  Future<void> _cancelQueue(BuildContext context, String machineId) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) return;
+
+    final queueDocs = await FirebaseFirestore.instance
+        .collection('machineQueues')
+        .where('machineId', isEqualTo: machineId)
+        .where('userId', isEqualTo: user.uid)
+        .where('status', isEqualTo: 'WAITING')
+        .get();
+
+    for (final doc in queueDocs.docs) {
+      await doc.reference.update({
+        'status': 'CANCELLED',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('줄서기가 취소되었습니다.')),
     );
   }
 }
