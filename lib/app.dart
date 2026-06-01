@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'my_page_wrapper.dart';
 import 'home.dart';
 import 'login.dart';
 import 'profile_setup_page.dart';
 import 'refrigerator_home_page.dart';
 import 'machine_home_page.dart';
 import 'machine_detail_page.dart';
+
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -22,6 +24,8 @@ class ShrineApp extends StatelessWidget {
         '/refrigeratorHome': (context) => const RefrigeratorHomePage(),
         '/machineHome': (context) => const MachineHomePage(),
         '/machineDetail': (context) => const MachineDetailPage(),
+        '/myPage': (context) => const MyPageWrapper(),
+        
       },
     );
   }
