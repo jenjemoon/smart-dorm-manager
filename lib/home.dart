@@ -295,7 +295,9 @@ class HomePage extends StatelessWidget {
             _bottomItem(
               icon: Icons.person_outline,
               label: '내 정보',
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/myPage');
+              },
             ),
           ],
         ),
