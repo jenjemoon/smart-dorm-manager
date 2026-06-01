@@ -64,12 +64,68 @@ class HomePage extends StatelessWidget {
                     userSnapshot.data!.data() as Map<String, dynamic>?;
 
                 final name = userData?['name'] ?? '사용자';
+                final role = userData?['role'] ?? 'STUDENT';
 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (role == 'BOTH')
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      '학생',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushReplacementNamed(
+                                      context,
+                                      '/adminHome',
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 52,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF0F0F0),
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        '관리자',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
