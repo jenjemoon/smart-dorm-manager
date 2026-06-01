@@ -93,7 +93,7 @@ class _AdminMyPageState extends State<AdminMyPage> with SingleTickerProviderStat
                 ],
               ),
               const SizedBox(height: 8),
-              Text('사번/학번: $studentNo', style: const TextStyle(color: Colors.white70, fontSize: 14)),
+              Text('학번: $studentNo', style: const TextStyle(color: Colors.white70, fontSize: 14)),
             ],
           ),
         );

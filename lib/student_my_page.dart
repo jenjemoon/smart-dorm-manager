@@ -134,7 +134,7 @@ class _StudentMyPageState extends State<StudentMyPage> with SingleTickerProvider
   Widget _buildLiveStatusSection() {
     return Row(
       children: [
-        //세탁
+        // 세탁
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -145,8 +145,28 @@ class _StudentMyPageState extends State<StudentMyPage> with SingleTickerProvider
                 .snapshots(),
             builder: (context, snapshot) {
               bool isRunning = snapshot.hasData && snapshot.data!.docs.isNotEmpty;
+              String? activeMachineId;
+              
+              if (isRunning) {
+                final data = snapshot.data!.docs.first.data() as Map<String, dynamic>;
+                activeMachineId = data['machineId'];
+              }
+
               return GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/home'),
+                onTap: () {
+                  if (isRunning && activeMachineId != null) {
+                    Navigator.pushNamed(
+                      context, 
+                      '/machineDetail',
+                      arguments: {
+                        'machineId': activeMachineId,
+                        'machineType': 'WASHER',
+                      }
+                    );
+                  } else {
+                    Navigator.pushNamed(context, '/machineHome');
+                  }
+                },
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -169,8 +189,7 @@ class _StudentMyPageState extends State<StudentMyPage> with SingleTickerProvider
           ),
         ),
         const SizedBox(width: 12),
-
-        //냉장거
+        // 냉장고 
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
@@ -181,7 +200,9 @@ class _StudentMyPageState extends State<StudentMyPage> with SingleTickerProvider
             builder: (context, snapshot) {
               int activeCount = snapshot.hasData ? snapshot.data!.docs.length : 0;
               return GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/refrigeratorHome'),
+                onTap: () {
+                  Navigator.pushNamed(context, '/refrigeratorHome');
+                },
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
