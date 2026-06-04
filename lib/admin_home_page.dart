@@ -117,7 +117,7 @@ class AdminHomePage extends StatelessWidget {
                               alignment: Alignment.centerRight,
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.pushNamed(context, '/myPage');
+                                  Navigator.pushNamed(context, '/adminMy');
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
