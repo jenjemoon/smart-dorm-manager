@@ -36,17 +36,22 @@ class HomePage extends StatelessWidget {
           '홈',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
-        ),
+        leading: null,
+        automaticallyImplyLeading: false,
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundColor: Colors.grey.shade300,
+          IconButton(
+            icon: const Icon(
+              Icons.notifications_none,
+              size: 30,
             ),
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                '/notificationPage',
+              );
+            },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: uid == null
@@ -129,21 +134,51 @@ class HomePage extends StatelessWidget {
                         ),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 24,
-                        ),
+                        padding: const EdgeInsets.all(28),
                         decoration: BoxDecoration(
                           color: Colors.black,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Text(
-                          '안녕하세요 $name님',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '안녕하세요\n$name님',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(context, '/myPage');
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 22,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: const Text(
+                                    '마이페이지',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 36),
@@ -156,10 +191,6 @@ class HomePage extends StatelessWidget {
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
-                          ),
-                          Text(
-                            'View all',
-                            style: TextStyle(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -257,108 +288,6 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-      bottomNavigationBar: Container(
-        height: 90,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(
-              color: Color(0xFFEAEAEA),
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _bottomItem(
-              icon: Icons.star,
-              label: '즐겨찾기',
-              onTap: () {},
-            ),
-            GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                    ),
-                  ),
-                  builder: (context) {
-                    return Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Text(
-                            '실행할 기능을 선택해주세요',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          ListTile(
-                            leading: const Icon(Icons.qr_code_scanner),
-                            title: const Text('QR 스캔'),
-                            subtitle: const Text('세탁기/건조기 사용 시작'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, '/qrScan');
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt_outlined),
-                            title: const Text('사진 촬영'),
-                            subtitle: const Text('냉장고 식품 등록'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.pushNamed(context, '/camera');
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              child: Container(
-                width: 84,
-                height: 84,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE7E7E7),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
-                      Icons.camera_alt_outlined,
-                      size: 36,
-                      color: Colors.black54,
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '카메라',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            _bottomItem(
-              icon: Icons.person_outline,
-              label: '내 정보',
-              onTap: () {
-                Navigator.pushNamed(context, '/myPage');
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 
