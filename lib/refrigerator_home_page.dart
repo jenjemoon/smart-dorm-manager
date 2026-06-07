@@ -32,10 +32,15 @@ class RefrigeratorHomePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('냉장고'),
+        title: const Text('냉장고', style: TextStyle(fontWeight: FontWeight.bold),),
+        
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: uid == null
           ? const Center(child: Text('로그인이 필요합니다.'))

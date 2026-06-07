@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// 경빈 push 테스트
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-// 방금 수정 완료 테스트 (혜연)
+
   String _formatStatus(String status) {
     switch (status) {
       case 'COMPLETED':
@@ -21,6 +20,78 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  void _showCameraModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  '무엇을 실행할까요?',
+                  style: TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 24),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFF9BC3FF),
+                    child:
+                        Icon(Icons.qr_code_2, color: Colors.black),
+                  ),
+                  title: const Text('QR 스캔',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  subtitle: const Text('세탁기 / 건조기 사용 시작'),
+                  trailing:
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/qrScan');
+                  },
+                ),
+                const SizedBox(height: 8),
+                ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xFFFFD83D),
+                    child:
+                        Icon(Icons.camera_alt, color: Colors.black),
+                  ),
+                  title: const Text('음식 등록',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  subtitle: const Text('냉장고 보관 식품 등록'),
+                  trailing:
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -32,28 +103,50 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black,
-        title: const Text(
-          '홈',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: null,
+        title: const Text('홈',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.notifications_none,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.pushNamed(
-                context,
-                '/notificationPage',
-              );
-            },
+            icon: const Icon(Icons.notifications_none, size: 30),
+            onPressed: () =>
+                Navigator.pushNamed(context, '/notificationPage'),
           ),
           const SizedBox(width: 8),
         ],
       ),
+      bottomNavigationBar: uid != null
+          ? Container(
+              height: 65,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                    top: BorderSide(color: Color(0xFFEAEAEA))),
+              ),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => _showCameraModal(context),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.camera_alt_outlined,
+                        color: Colors.white, size: 24),
+                  ),
+                ),
+              ),
+            )
+          : null,
       body: uid == null
           ? const Center(child: Text('로그인이 필요합니다.'))
           : StreamBuilder<DocumentSnapshot>(
@@ -63,12 +156,12 @@ class HomePage extends StatelessWidget {
                   .snapshots(),
               builder: (context, userSnapshot) {
                 if (!userSnapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(
+                      child: CircularProgressIndicator());
                 }
 
-                final userData =
-                    userSnapshot.data!.data() as Map<String, dynamic>?;
-
+                final userData = userSnapshot.data!.data()
+                    as Map<String, dynamic>?;
                 final name = userData?['name'] ?? '사용자';
                 final role = userData?['role'] ?? 'STUDENT';
 
@@ -87,44 +180,38 @@ class HomePage extends StatelessWidget {
                                   height: 52,
                                   decoration: BoxDecoration(
                                     color: Colors.black,
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius:
+                                        BorderRadius.circular(30),
                                   ),
                                   child: const Center(
-                                    child: Text(
-                                      '학생',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
+                                    child: Text('학생',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight:
+                                                FontWeight.bold)),
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushReplacementNamed(
-                                      context,
-                                      '/adminHome',
-                                    );
-                                  },
+                                  onTap: () =>
+                                      Navigator.pushReplacementNamed(
+                                          context, '/adminHome'),
                                   child: Container(
                                     height: 52,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFF0F0F0),
-                                      borderRadius: BorderRadius.circular(30),
+                                      borderRadius:
+                                          BorderRadius.circular(30),
                                     ),
                                     child: const Center(
-                                      child: Text(
-                                        '관리자',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
+                                      child: Text('관리자',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight:
+                                                  FontWeight.bold)),
                                     ),
                                   ),
                                 ),
@@ -132,6 +219,8 @@ class HomePage extends StatelessWidget {
                             ],
                           ),
                         ),
+
+                      // 인사말 카드
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(28),
@@ -155,17 +244,17 @@ class HomePage extends StatelessWidget {
                             Align(
                               alignment: Alignment.centerRight,
                               child: GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/studentMy');
-                                },
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/studentMy'),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 22,
-                                    vertical: 12,
-                                  ),
+                                  padding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 22,
+                                          vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(30),
+                                    borderRadius:
+                                        BorderRadius.circular(30),
                                   ),
                                   child: const Text(
                                     '마이페이지',
@@ -182,23 +271,17 @@ class HomePage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 36),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          Text(
-                            '시설 카테고리',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      const Text(
+                        '시설 카테고리',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 20),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/machineHome');
-                        },
+                        onTap: () => Navigator.pushNamed(
+                            context, '/machineHome'),
                         child: _categoryCard(
                           color: const Color(0xFF9BC3FF),
                           icon: Icons.local_laundry_service_outlined,
@@ -207,28 +290,201 @@ class HomePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/refrigeratorHome');
-                        },
+                        onTap: () => Navigator.pushNamed(
+                            context, '/refrigeratorHome'),
                         child: _categoryCard(
                           color: const Color(0xFFFFD83D),
                           icon: Icons.kitchen_outlined,
                           title: '냉장고',
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      _categoryCard(
-                        color: const Color(0xFFB8F7A7),
-                        icon: Icons.notifications_none,
-                        title: '알림',
+
+                      const SizedBox(height: 24),
+
+                      // ── 사용 중 / 수거 대기 기기 실시간 모듈 ──
+                      StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('usageSessions')
+                            .where('userId', isEqualTo: uid)
+                            .where('status', isEqualTo: 'RUNNING')
+                            .limit(1)
+                            .snapshots(),
+                        builder: (context, activeSnapshot) {
+                          if (!activeSnapshot.hasData ||
+                              activeSnapshot.data!.docs.isEmpty) {
+                            return const SizedBox();
+                          }
+
+                          final sessionDoc =
+                              activeSnapshot.data!.docs.first;
+                          final activeSession =
+                              sessionDoc.data() as Map<String, dynamic>;
+                          final machineId =
+                              activeSession['machineId'] ?? '';
+                          final endTime =
+                              activeSession['endTime'] as Timestamp?;
+                          final machineType =
+                              activeSession['machineType'] ?? 'WASHER';
+
+                          // 기기 정보 실시간 조회 (종류+층+번호)
+                          return StreamBuilder<DocumentSnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('machines')
+                                .doc(machineId)
+                                .snapshots(),
+                            builder: (context, machineSnap) {
+                              if (!machineSnap.hasData) {
+                                return const SizedBox();
+                              }
+                              final mData = machineSnap.data!.data()
+                                  as Map<String, dynamic>?;
+                              if (mData == null) return const SizedBox();
+
+                              final machineStatus =
+                                  mData['status'] ?? 'USING';
+
+                              // AVAILABLE이 되면 모듈 사라짐
+                              if (machineStatus == 'AVAILABLE') {
+                                return const SizedBox();
+                              }
+
+                              final mType =
+                                  mData['machineType'] == 'DRYER'
+                                      ? '건조기'
+                                      : '세탁기';
+                              final floor = mData['floor'] ?? '?';
+                              final machineNo =
+                                  mData['machineNo'] ?? '';
+                              final label =
+                                  '$mType · $floor층 · $machineNo번';
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    '/machineDetail',
+                                    arguments: {
+                                      'machineId': machineId,
+                                      'machineType': machineType,
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 24),
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius:
+                                        BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding:
+                                            const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white
+                                              .withOpacity(0.2),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          machineType == 'DRYER'
+                                              ? Icons.dry_cleaning
+                                              : Icons
+                                                  .local_laundry_service,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              machineStatus ==
+                                                      'WAITING'
+                                                  ? '수거 대기 중'
+                                                  : '사용 중인 기기',
+                                              style: const TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 13),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              label,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 18,
+                                                fontWeight:
+                                                    FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // 실시간 카운트다운
+                                      if (endTime != null)
+                                        StreamBuilder(
+                                          stream: Stream.periodic(
+                                              const Duration(
+                                                  seconds: 1)),
+                                          builder:
+                                              (context, timerSnap) {
+                                            final now = DateTime.now();
+                                            final end =
+                                                endTime.toDate();
+                                            final diff =
+                                                end.difference(now);
+
+                                            if (diff.isNegative) {
+                                              return const Text(
+                                                '수거 대기',
+                                                style: TextStyle(
+                                                  color: Colors.orange,
+                                                  fontSize: 16,
+                                                  fontWeight:
+                                                      FontWeight.bold,
+                                                ),
+                                              );
+                                            }
+
+                                            final m = diff.inMinutes
+                                                .toString()
+                                                .padLeft(2, '0');
+                                            final s = (diff.inSeconds %
+                                                    60)
+                                                .toString()
+                                                .padLeft(2, '0');
+
+                                            return Text(
+                                              '$m:$s',
+                                              style: const TextStyle(
+                                                color:
+                                                    Color(0xFF9BC3FF),
+                                                fontSize: 22,
+                                                fontWeight:
+                                                    FontWeight.bold,
+                                                letterSpacing: 1.5,
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
-                      const SizedBox(height: 40),
+
+                      const SizedBox(height: 16),
                       const Text(
                         '최근 이용 내역',
                         style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
+                            fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 20),
                       StreamBuilder<QuerySnapshot>(
@@ -242,28 +498,26 @@ class HomePage extends StatelessWidget {
                           if (sessionSnapshot.connectionState ==
                               ConnectionState.waiting) {
                             return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+                                child: CircularProgressIndicator());
                           }
 
                           if (!sessionSnapshot.hasData ||
                               sessionSnapshot.data!.docs.isEmpty) {
                             return const Padding(
                               padding: EdgeInsets.only(top: 20),
-                              child: Text(
-                                '최근 이용 내역이 없습니다.',
-                                style: TextStyle(color: Colors.grey),
-                              ),
+                              child: Text('최근 이용 내역이 없습니다.',
+                                  style:
+                                      TextStyle(color: Colors.grey)),
                             );
                           }
 
-                          final sessions = sessionSnapshot.data!.docs;
-
                           return Column(
-                            children: sessions.map((doc) {
-                              final data = doc.data() as Map<String, dynamic>;
-
-                              final machineId = data['machineId'] ?? '기기 정보 없음';
+                            children: sessionSnapshot.data!.docs
+                                .map((doc) {
+                              final data =
+                                  doc.data() as Map<String, dynamic>;
+                              final machineId =
+                                  data['machineId'] ?? '';
                               final status = data['status'] ?? '';
                               final endTime = data['endTime'];
 
@@ -274,8 +528,8 @@ class HomePage extends StatelessWidget {
                                     '사용 종료 · ${date.year}.${date.month}.${date.day}';
                               }
 
-                              return _usageItem(
-                                title: machineId,
+                              return _UsageItemWithMachineInfo(
+                                machineId: machineId,
                                 subtitle: subText,
                                 status: _formatStatus(status),
                               );
@@ -309,97 +563,99 @@ class HomePage extends StatelessWidget {
         children: [
           Icon(icon, size: 28),
           const Spacer(),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
+}
 
-  Widget _usageItem({
-    required String title,
-    required String subtitle,
-    required String status,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
-      child: Row(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Icon(Icons.local_laundry_service_outlined),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 17,
+// ── 최근 이용 내역 아이템 (기기 정보 표시) ──
+class _UsageItemWithMachineInfo extends StatelessWidget {
+  final String machineId;
+  final String subtitle;
+  final String status;
+
+  const _UsageItemWithMachineInfo({
+    required this.machineId,
+    required this.subtitle,
+    required this.status,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('machines')
+          .doc(machineId)
+          .get(),
+      builder: (context, snap) {
+        String title = machineId;
+        if (snap.hasData && snap.data!.exists) {
+          final d = snap.data!.data() as Map<String, dynamic>;
+          final mType =
+              d['machineType'] == 'DRYER' ? '건조기' : '세탁기';
+          final floor = d['floor'] ?? '?';
+          final no = d['machineNo'] ?? '';
+          title = '$mType · $floor층 · $no번';
+        }
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: Row(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Icon(
+                    Icons.local_laundry_service_outlined),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                          fontSize: 15, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(subtitle,
+                        style: const TextStyle(color: Colors.grey)),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: status == '진행'
+                      ? Colors.black
+                      : Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  status,
+                  style: TextStyle(
+                    color: status == '진행'
+                        ? Colors.white
+                        : Colors.black,
+                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: status == '진행' ? Colors.black : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              status,
-              style: TextStyle(
-                color: status == '진행' ? Colors.white : Colors.black,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _bottomItem({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 34),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
