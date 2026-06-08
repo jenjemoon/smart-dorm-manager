@@ -11,6 +11,7 @@ import 'admin_my_page.dart';
 import 'student_my_page.dart';
 import 'notification_page.dart';
 import 'refrigerator_camera_page.dart';
+import 'qr_scan_page.dart';
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -32,6 +33,7 @@ class ShrineApp extends StatelessWidget {
         '/adminHome': (context) => const AdminHomePage(),
         '/notificationPage': (context) => const NotificationPage(),
         '/refrigeratorCamera': (context) => const RefrigeratorCameraPage(),
+        '/qrScan': (context) => const QRScanPage(),
       },
     );
   }
