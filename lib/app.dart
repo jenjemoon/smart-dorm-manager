@@ -11,7 +11,6 @@ import 'admin_home_page.dart';
 import 'admin_my_page.dart';
 import 'student_my_page.dart';
 import 'notification_page.dart';
-import 'qr_scan_page.dart';
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -32,7 +31,6 @@ class ShrineApp extends StatelessWidget {
         '/adminMy': (context) => const AdminMyPage(),
        '/adminHome': (context) => const AdminHomePage(),
         '/notificationPage': (context) => const NotificationPage(),
-        '/qrScan': (context) => const QRScanPage(),
       },
     );
   }
