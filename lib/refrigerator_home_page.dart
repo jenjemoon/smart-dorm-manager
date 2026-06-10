@@ -154,10 +154,7 @@ class RefrigeratorHomePage extends StatelessWidget {
                                   title: '제품 등록',
                                   backgroundColor: Colors.grey.shade200,
                                   textColor: Colors.black,
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                        context, '/refrigeratorCamera');
-                                  },
+                                  onTap: () {},
                                 ),
                               ),
                               const SizedBox(width: 12),
