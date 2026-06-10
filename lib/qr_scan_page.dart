@@ -18,6 +18,8 @@ class _QRScanPageState extends State<QRScanPage> {
   String? _expectedMachineId; // 종료 모드일 때 재태깅 확인용
   bool _isStopMode = false;
 
+  static const int _defaultMinutes = 50; // 기본 사용 시간
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -26,6 +28,19 @@ class _QRScanPageState extends State<QRScanPage> {
       _isStopMode = args['mode'] == 'STOP';
       _expectedMachineId = args['machineId'] as String?;
     }
+  }
+
+  // laundryRoomId(숫자) -> floor 조회 (디테일 페이지와 동일한 방식)
+  Future<int?> _loadFloor(dynamic laundryRoomId) async {
+    if (laundryRoomId == null) return null;
+    final snap = await FirebaseFirestore.instance
+        .collection('laundryRooms')
+        .where('laundryRoomId', isEqualTo: laundryRoomId.toString())
+        .limit(1)
+        .get();
+    if (snap.docs.isEmpty) return null;
+    final floor = snap.docs.first.data()['floor'];
+    return floor is int ? floor : int.tryParse('$floor');
   }
 
   void _onDetect(BarcodeCapture capture) async {
@@ -58,6 +73,10 @@ class _QRScanPageState extends State<QRScanPage> {
     final currentUserId = data['currentUserId'] ?? '';
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
+    // 층 정보 미리 조회 (바텀시트 표시에 사용)
+    final floor = await _loadFloor(data['laundryRoomId']);
+    if (!mounted) return;
+
     // ── 종료 모드: 사용 종료 버튼 누르고 재태깅 ──
     if (_isStopMode) {
       if (_expectedMachineId != null && code != _expectedMachineId) {
@@ -75,12 +94,12 @@ class _QRScanPageState extends State<QRScanPage> {
     // ── 일반 스캔 모드 ──
     if (status == 'AVAILABLE') {
       // 사용 가능 → 시작 확인 바텀시트
-      _showStartBottomSheet(code, data);
+      _showStartBottomSheet(code, data, floor);
     } else if ((status == 'USING' || status == 'WAITING') &&
         uid != null &&
         currentUserId == uid) {
       // 내가 사용 중 → 종료 확인 바텀시트
-      _showStopBottomSheet(code, data);
+      _showStopBottomSheet(code, data, floor);
     } else {
       // 다른 사람이 사용 중
       if (!mounted) return;
@@ -92,9 +111,10 @@ class _QRScanPageState extends State<QRScanPage> {
   }
 
   // ── 사용 시작 바텀시트 ──
-  void _showStartBottomSheet(String machineId, Map<String, dynamic> data) {
+  void _showStartBottomSheet(
+      String machineId, Map<String, dynamic> data, int? floor) {
     final typeStr = data['machineType'] == 'DRYER' ? '건조기' : '세탁기';
-    final floor = data['floor'] ?? '?';
+    final floorStr = floor != null ? '$floor층' : '';
     final machineNo = data['machineNo'] ?? '';
 
     showModalBottomSheet(
@@ -116,7 +136,7 @@ class _QRScanPageState extends State<QRScanPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('$floor층 $typeStr',
+                      Text('$floorStr $typeStr'.trim(),
                           style: const TextStyle(color: Colors.grey)),
                       Text('$machineNo번 기기',
                           style: const TextStyle(
@@ -128,7 +148,8 @@ class _QRScanPageState extends State<QRScanPage> {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: () => _startMachine(machineId, data['machineType']),
+                    onPressed: () =>
+                        _startMachine(machineId, data['machineType']),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
@@ -151,9 +172,10 @@ class _QRScanPageState extends State<QRScanPage> {
   }
 
   // ── 사용 종료 바텀시트 (내가 사용 중일 때 재태깅) ──
-  void _showStopBottomSheet(String machineId, Map<String, dynamic> data) {
+  void _showStopBottomSheet(
+      String machineId, Map<String, dynamic> data, int? floor) {
     final typeStr = data['machineType'] == 'DRYER' ? '건조기' : '세탁기';
-    final floor = data['floor'] ?? '?';
+    final floorStr = floor != null ? '$floor층' : '';
     final machineNo = data['machineNo'] ?? '';
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
@@ -176,7 +198,7 @@ class _QRScanPageState extends State<QRScanPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('$floor층 $typeStr',
+                      Text('$floorStr $typeStr'.trim(),
                           style: const TextStyle(color: Colors.grey)),
                       Text('$machineNo번 기기',
                           style: const TextStyle(
@@ -216,15 +238,19 @@ class _QRScanPageState extends State<QRScanPage> {
     if (uid == null) return;
 
     final now = DateTime.now();
-    final endTime = now.add(const Duration(minutes: 50));
+    final endTime = now.add(const Duration(minutes: _defaultMinutes));
 
     final batch = FirebaseFirestore.instance.batch();
 
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
+    // ★ 기기 문서에도 시간 정보를 써줘야 디테일 페이지 카운트다운이 동작함
     batch.update(machineRef, {
       'status': 'USING',
       'currentUserId': uid,
+      'startTime': Timestamp.fromDate(now),
+      'endTime': Timestamp.fromDate(endTime),
+      'extendCount': 0,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -271,12 +297,16 @@ class _QRScanPageState extends State<QRScanPage> {
       });
     }
 
-    // 기기 AVAILABLE로 초기화
+    // 기기 AVAILABLE로 초기화 — ★ 시간 정보까지 깨끗이 지워야
+    // 다음 사용자(또는 같은 사용자)가 다시 50분부터 시작됨
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
     batch.update(machineRef, {
       'status': 'AVAILABLE',
       'currentUserId': FieldValue.delete(),
+      'startTime': FieldValue.delete(),
+      'endTime': FieldValue.delete(),
+      'extendCount': FieldValue.delete(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
 

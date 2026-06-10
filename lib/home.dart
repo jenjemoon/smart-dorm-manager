@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// 경빈 push 테스트
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-// 방금 수정 완료 테스트 (혜연)
+
   String _formatStatus(String status) {
     switch (status) {
       case 'COMPLETED':
@@ -120,6 +120,40 @@ class HomePage extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
+
+bottomNavigationBar: uid != null
+          ? Container(
+              height: 65,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                border: Border(
+                    top: BorderSide(color: Color(0xFFEAEAEA))),
+              ),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => _showCameraModal(context),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.camera_alt_outlined,
+                        color: Colors.white, size: 24),
+                  ),
+                ),
+              ),
+            )
+          : null,
+
       body: uid == null
           ? const Center(child: Text('로그인이 필요합니다.'))
           : StreamBuilder<DocumentSnapshot>(
@@ -282,7 +316,9 @@ class HomePage extends StatelessWidget {
                           title: '냉장고',
                         ),
                       ),
+
                       const SizedBox(height: 16),
+                      
                       _categoryCard(
                         color: const Color(0xFFB8F7A7),
                         icon: Icons.notifications_none,

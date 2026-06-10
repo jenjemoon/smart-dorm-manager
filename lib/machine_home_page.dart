@@ -62,23 +62,22 @@ class _MachineHomePageState extends State<MachineHomePage> {
       backgroundColor: const Color(0xFFF8F8F8),
       appBar: AppBar(
         title: const Text(
-          '홈',
+          '세탁실',
           style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.menu),
-          onPressed: () {},
         ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CircleAvatar(
-              backgroundColor: Colors.grey.shade300,
-            ),
+          IconButton(
+            icon: const Icon(Icons.notifications_none, size: 28),
+            onPressed: () => Navigator.pushNamed(context, '/notificationPage'),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
@@ -152,8 +151,27 @@ class _MachineHomePageState extends State<MachineHomePage> {
                           final machineNo = data['machineNo'] ?? '';
                           final status = data['status'] ?? 'AVAILABLE';
                           final location = data['location'] ?? '--';
-                          final remainingTime =
-                              data['remainingTime'] ?? '00:00';
+
+                          final Timestamp? endTimeTimestamp =
+                              data['endTime'] as Timestamp?;
+                          String remainingTime = '00:00';
+
+                          if (status == 'USING' && endTimeTimestamp != null) {
+                            final endTime = endTimeTimestamp.toDate();
+                            final diff = endTime.difference(DateTime.now());
+
+                            if (diff.inSeconds > 0) {
+                              final minutes = (diff.inSeconds ~/ 60)
+                                  .toString()
+                                  .padLeft(2, '0');
+                              final seconds = (diff.inSeconds % 60)
+                                  .toString()
+                                  .padLeft(2, '0');
+                              remainingTime = '$minutes:$seconds';
+                            } else {
+                              remainingTime = '00:00';
+                            }
+                          }
 
                           return GestureDetector(
                             onTap: () {
@@ -302,7 +320,7 @@ class _MachineHomePageState extends State<MachineHomePage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text('⌾ $location'),
+                //Text('$location'),
                 if (isUsing) ...[
                   const SizedBox(height: 8),
                   Text('남은 시간 $remainingTime'),

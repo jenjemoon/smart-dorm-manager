@@ -77,19 +77,35 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
           final bool isMine = currentUid != null && currentUid == currentUserId;
           final bool isAvailable = status == 'AVAILABLE';
 
-          // 소유자 화면에서만 만료 시 DB에 WAITING 한 번 반영
-          if (rawStatus == 'USING' && expired && isMine && !_waitingPersisted) {
+// [수정] 누구나 화면을 보면 시간이 만료됐을 때 WAITING 처리 및 수거 시작 시간 기록
+          if (rawStatus == 'USING' && expired && !_waitingPersisted) {
             _waitingPersisted = true;
             FirebaseFirestore.instance
                 .collection('machines')
                 .doc(machineId)
                 .update({
               'status': 'WAITING',
+              'waitingStartTime':
+                  FieldValue.serverTimestamp(), // 미수거 타이머 시작 시각 기록
               'updatedAt': FieldValue.serverTimestamp(),
             });
           }
           if (rawStatus == 'USING' && !expired) {
-            _waitingPersisted = false; // 연장 등으로 다시 진행되면 가드 해제
+            _waitingPersisted = false; // 연장 등으로 다시 타이머가 진행되면 가드 해제
+          }
+
+// [추가] WAITING(수거 대기) 상태인데 기록된 대기 시작 시각으로부터 10분이 지났는지 실시간 검사
+          final Timestamp? waitingStartTimestamp =
+              machine['waitingStartTime'] as Timestamp?;
+          if (rawStatus == 'WAITING' && waitingStartTimestamp != null) {
+            final waitingStartTime = waitingStartTimestamp.toDate();
+            final bool isOver10Minutes =
+                DateTime.now().difference(waitingStartTime).inMinutes >= 10;
+
+            if (isOver10Minutes) {
+              // 10분이 넘었으므로 대기열을 회전시키는 비동기 함수 실행
+              _rotateQueueToNextUser(machineId);
+            }
           }
 
           return SingleChildScrollView(
@@ -126,7 +142,10 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
                     extendCount: extendCount,
                   )
                 else
-                  _otherUsingButtons(context, machineId),
+                  (status == 'WAITING')
+                      ? _buildCollectRequestButton(context, machineId,
+                          (machine['currentUserId'] ?? '').toString())
+                      : _otherUsingButtons(context, machineId),
                 const SizedBox(height: 28),
                 const Text('메시지',
                     style: TextStyle(fontWeight: FontWeight.bold)),
@@ -191,11 +210,14 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
 
   // 사용 가능: QR 스캔으로 시작 (시작은 반드시 기기 QR을 태깅해서)
   Widget _availableButton(BuildContext context) {
-    return _actionButton(
-      icon: Icons.qr_code_scanner,
-      title: 'QR 스캔하여 사용 시작',
-      isDark: true,
-      onTap: () => Navigator.pushNamed(context, '/qrScan'),
+    return SizedBox(
+      width: double.infinity,
+      child: _actionButton(
+        icon: Icons.qr_code_scanner,
+        title: 'QR 스캔하여 사용 시작',
+        isDark: true,
+        onTap: () => Navigator.pushNamed(context, '/qrScan'),
+      ),
     );
   }
 
@@ -476,9 +498,112 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
       const SnackBar(content: Text('줄서기가 취소되었습니다.')),
     );
   }
-}
 
-// ── 실시간 카운트다운 카드 ──────────────────────────────
+  Widget _buildCollectRequestButton(
+      BuildContext context, String machineId, String targetUserId) {
+    return SizedBox(
+      width: double.infinity,
+      child: _actionButton(
+        icon: Icons.notification_important,
+        title: '세탁물 수거 요청 알림 보내기',
+        isDark: false,
+        onTap: () async {
+          if (targetUserId.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('기기 사용자 정보를 찾을 수 없습니다.')),
+            );
+            return;
+          }
+
+          final docRef =
+              FirebaseFirestore.instance.collection('notifications').doc();
+
+          await docRef.set({
+            'notificationId': docRef.id, 
+            'userId': targetUserId, 
+            'message': '다음 대기 학생이 기다리고 있습니다! 신속하게 세탁물을 수거해 주세요.',
+            'type': 'COLLECT_REQUEST',
+            'isRead': false,
+            'sessionId': machineId,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('사용자에게 수거 독촉 알림을 전송했습니다.')),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  // [새로 추가 2] 10분 미수거 시 대기열(machineQueues)의 다음 사람으로 기기 주인을 교체하는 핵심 함수
+  Future<void> _rotateQueueToNextUser(String machineId) async {
+    final machineRef =
+        FirebaseFirestore.instance.collection('machines').doc(machineId);
+
+    // 1. 현재 이 기기에 줄 서서 대기 중인 첫 번째 사람(WAITING 상태) 가져오기
+    final queueSnap = await FirebaseFirestore.instance
+        .collection('machineQueues')
+        .where('machineId', isEqualTo: machineId)
+        .where('status', isEqualTo: 'WAITING')
+        .orderBy('createdAt')
+        .limit(1)
+        .get();
+
+    if (queueSnap.docs.isEmpty) {
+      // 대기자가 아무도 없는 경우 -> 사용 가능(AVAILABLE) 상태로 전면 초기화
+      await machineRef.update({
+        'status': 'AVAILABLE',
+        'currentUserId': '',
+        'startTime': null,
+        'endTime': null,
+        'waitingStartTime': null,
+        'extendCount': 0,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    } else {
+      // 대기자가 있는 경우 -> 가장 먼저 줄 선 사람 정보 추출
+      final firstQueueDoc = queueSnap.docs.first;
+      final String nextUserId = firstQueueDoc.data()['userId'] ?? '';
+
+      // 기기 정보를 다음 대기 유저 정보로 교체 업데이트 (기본 타임 50분 세팅)
+      await machineRef.update({
+        'status': 'USING',
+        'currentUserId': nextUserId,
+        'startTime': FieldValue.serverTimestamp(),
+        'endTime':
+            Timestamp.fromDate(DateTime.now().add(const Duration(minutes: 50))),
+        'waitingStartTime': null,
+        'extendCount': 0,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // 대기열 목록에서 이 사람의 상태를 완료(DONE)처리하여 대기자 큐에서 제외
+      await firstQueueDoc.reference.update({
+        'status': 'DONE',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      // 새 유저의 알림방(notifications)에 순번 도래 알림 자동 전송
+      await FirebaseFirestore.instance.collection('notifications').add({
+        'userId': nextUserId,
+        'message':
+            '이전 사용자의 미수거로 인해 대기 순번이 돌아왔습니다. 전 사용자 세탁물을 수거함에 빼두고 이용해 주세요!',
+        'type': 'QUEUE_TURN',
+        'isRead': false,
+        'sessionId': '',
+        'notificationId': '',
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+} // 클래스 마지막
+
+// ---- 실시간 카운트다운 카드 ------------
 class _MachineInfoCard extends StatelessWidget {
   final String title;
   final String status;
