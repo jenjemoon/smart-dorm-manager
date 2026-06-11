@@ -1,1 +1,55 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"handong-dorm-manager","appId":"1:1044048419847:android:1608d4d7a402695e965ea2","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"handong-dorm-manager","appId":"1:1044048419847:ios:08cf42229a6e4510965ea2","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"handong-dorm-manager","appId":"1:1044048419847:ios:08cf42229a6e4510965ea2","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"handong-dorm-manager","configurations":{"android":"1:1044048419847:android:1608d4d7a402695e965ea2","ios":"1:1044048419847:ios:08cf42229a6e4510965ea2","macos":"1:1044048419847:ios:08cf42229a6e4510965ea2","web":"1:1044048419847:web:8b57a9e93c60a537965ea2","windows":"1:1044048419847:web:04cf4fcf2165ede6965ea2"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "handong-dorm-manager",
+          "appId": "1:1044048419847:android:1608d4d7a402695e965ea2",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "handong-dorm-manager",
+          "appId": "1:1044048419847:ios:08cf42229a6e4510965ea2",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "handong-dorm-manager",
+          "appId": "1:1044048419847:ios:08cf42229a6e4510965ea2",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "handong-dorm-manager",
+          "configurations": {
+            "android": "1:1044048419847:android:1608d4d7a402695e965ea2",
+            "ios": "1:1044048419847:ios:08cf42229a6e4510965ea2",
+            "macos": "1:1044048419847:ios:08cf42229a6e4510965ea2",
+            "web": "1:1044048419847:web:8b57a9e93c60a537965ea2",
+            "windows": "1:1044048419847:web:04cf4fcf2165ede6965ea2"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}

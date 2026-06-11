@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -76,6 +75,7 @@ class HomePage extends StatelessWidget {
                   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                   onTap: () {
                     Navigator.pop(context);
+                    Navigator.pushNamed(context, '/refrigeratorCamera');
                   },
                 ),
                 const SizedBox(height: 10),
@@ -120,14 +120,12 @@ class HomePage extends StatelessWidget {
           const SizedBox(width: 8),
         ],
       ),
-
-bottomNavigationBar: uid != null
+      bottomNavigationBar: uid != null
           ? Container(
               height: 65,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                border: Border(
-                    top: BorderSide(color: Color(0xFFEAEAEA))),
+                border: Border(top: BorderSide(color: Color(0xFFEAEAEA))),
               ),
               child: Center(
                 child: GestureDetector(
@@ -153,7 +151,6 @@ bottomNavigationBar: uid != null
               ),
             )
           : null,
-
       body: uid == null
           ? const Center(child: Text('로그인이 필요합니다.'))
           : StreamBuilder<DocumentSnapshot>(
@@ -316,9 +313,7 @@ bottomNavigationBar: uid != null
                           title: '냉장고',
                         ),
                       ),
-
                       const SizedBox(height: 16),
-                      
                       _categoryCard(
                         color: const Color(0xFFB8F7A7),
                         icon: Icons.notifications_none,
