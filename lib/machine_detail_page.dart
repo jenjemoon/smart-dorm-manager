@@ -87,15 +87,15 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
                 .update({
               'status': 'WAITING',
               'waitingStartTime':
-                  FieldValue.serverTimestamp(), // 미수거 타이머 시작 시각 기록
+                  FieldValue.serverTimestamp(), 
               'updatedAt': FieldValue.serverTimestamp(),
             });
           }
           if (rawStatus == 'USING' && !expired) {
-            _waitingPersisted = false; // 연장 등으로 다시 타이머가 진행되면 가드 해제
+            _waitingPersisted = false; 
           }
 
-// WAITING(수거 대기) 상태에서 10분 초과됐는지 확인
+// 수거 대기 상태에서 10분 초과됐는지 확인
           final Timestamp? waitingStartTimestamp =
               machine['waitingStartTime'] as Timestamp?;
           if (rawStatus == 'WAITING' && waitingStartTimestamp != null) {
@@ -104,7 +104,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
                 DateTime.now().difference(waitingStartTime).inMinutes >= 10;
 
             if (isOver10Minutes) {
-              // 10분이 넘었으므로 대기열 회전
+              //대기열 넘어가기
               _rotateQueueToNextUser(machineId);
             }
           }
@@ -209,7 +209,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     );
   }
 
-  // 사용 가능: QR 스캔으로 시작 (시작은 반드시 기기 QR을 태깅해서)
+  // QR 스캔으로 시작
   Widget _availableButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -250,7 +250,8 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
             icon: Icons.stop_circle_outlined,
             title: '사용 종료',
             isDark: true,
-            // 종료는 기기 QR 재태깅으로 처리 -> QR 스캔 화면으로 이동
+
+            // 재태깅으로 종료
             onTap: () => Navigator.pushNamed(context, '/qrScan'),
           ),
         ),
@@ -274,7 +275,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     if (data == null) return;
 
     final currentEnd = (data['endTime'] as Timestamp?)?.toDate();
-    // 이미 만료됐다면 지금부터 +10분, 아직 진행 중이면 기존 endTime +10분
+    // 이미 만료됐다면 지금부터 +10분, 아직 진행 중이면 기존 endTime +10분 [AI 도움 받음]
     final base = (currentEnd == null || DateTime.now().isAfter(currentEnd))
         ? DateTime.now()
         : currentEnd;
@@ -288,7 +289,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    // 진행 중 세션의 endTime도 동기화
+    // 진행 중 세션의 endTime도 동기화  [AI 도움 받음]
     final sessions = await FirebaseFirestore.instance
         .collection('usageSessions')
         .where('machineId', isEqualTo: machineId)
@@ -310,7 +311,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     );
   }
 
-  // 남이 사용 중: 줄서기
+  // 남이 사용 중: 줄서기 
   Widget _otherUsingButtons(BuildContext context, String machineId) {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     return StreamBuilder<QuerySnapshot>(
@@ -540,7 +541,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     );
   }
 
-  // 10분 미수거 시 대기열(machineQueues)의 다음 사람으로 교체하는 함수
+  // 10분 미수거 시 대기열(machineQueues)의 다음 사람으로 교체하는 함수  [AI 도움 받음]
   Future<void> _rotateQueueToNextUser(String machineId) async {
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
@@ -603,7 +604,8 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     }
   }
 } 
-// ---- 실시간 카운트다운 카드 ------------
+
+//그 카운트다운 카드
 class _MachineInfoCard extends StatelessWidget {
   final String title;
   final String status;

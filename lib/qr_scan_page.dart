@@ -14,11 +14,10 @@ class _QRScanPageState extends State<QRScanPage> {
   final MobileScannerController _cameraController = MobileScannerController();
   bool _isProcessing = false;
 
-  // route arguments에서 stopMode 여부와 기기 ID 받기
-  String? _expectedMachineId; // 종료 모드일 때 재태깅 확인용
+  String? _expectedMachineId; 
   bool _isStopMode = false;
 
-  static const int _defaultMinutes = 50; // 기본 사용 시간
+  static const int _defaultMinutes = 50; // 기본 사용 시간 (테스트 할때 이부분 조절하면 됩니당)
 
   @override
   void didChangeDependencies() {
@@ -30,7 +29,7 @@ class _QRScanPageState extends State<QRScanPage> {
     }
   }
 
-  // laundryRoomId(숫자) -> floor 조회
+  
   Future<int?> _loadFloor(dynamic laundryRoomId) async {
     if (laundryRoomId == null) return null;
     final snap = await FirebaseFirestore.instance
@@ -245,7 +244,8 @@ class _QRScanPageState extends State<QRScanPage> {
 
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
-    // 기기 문서에도 시간 정보 써줌 -> 디테일 페이지에서도 카운트다운 동작
+
+    // 디테일 페이지에서도 카운트다운 동작  [AI 도움 받음]
     batch.update(machineRef, {
       'status': 'USING',
       'currentUserId': uid,
@@ -290,7 +290,7 @@ class _QRScanPageState extends State<QRScanPage> {
 
     final batch = FirebaseFirestore.instance.batch();
 
-    // 세션 COMPLETED 처리
+    // 완료 처리
     for (final doc in sessionQuery.docs) {
       batch.update(doc.reference, {
         'status': 'COMPLETED',
@@ -298,9 +298,7 @@ class _QRScanPageState extends State<QRScanPage> {
       });
     }
 
-    // 기기 초기화
-    //시간 정보까지 깨끗이 지움 -> 다시 50분부터 시작
-
+    // 초기화
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
     batch.update(machineRef, {
@@ -315,9 +313,7 @@ class _QRScanPageState extends State<QRScanPage> {
     await batch.commit();
 
     if (!mounted) return;
-    // 바텀시트가 열려있으면 닫고
     if (Navigator.canPop(context)) Navigator.pop(context);
-    // 홈으로
     Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
