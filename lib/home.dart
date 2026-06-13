@@ -500,12 +500,6 @@ class HomePage extends StatelessWidget {
                         },
                       ),
 
-                      const Text(
-                        '최근 이용 내역',
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('usageSessions')
