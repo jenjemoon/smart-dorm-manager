@@ -225,7 +225,9 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
         border: const OutlineInputBorder(),
         suffixIcon: isDone ? const Icon(Icons.check) : null,
       ),
+
       onChanged: (value) async {
+        
         // 학번 8자리 자동 다음
         if (index == 1 && value.length == 8) {
           await Future.delayed(const Duration(milliseconds: 300));

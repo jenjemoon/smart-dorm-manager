@@ -10,7 +10,8 @@ class MachineDetailPage extends StatefulWidget {
 }
 
 class _MachineDetailPageState extends State<MachineDetailPage> {
-  bool _waitingPersisted = false; // endTime 만료 시 WAITING 1회만 반영하기 위해
+  bool _waitingPersisted = false;
+  
 
   String _formatType(String? type) => type == 'DRYER' ? '건조기' : '세탁기';
 
@@ -68,7 +69,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
           final startTime = (machine['startTime'] as Timestamp?)?.toDate();
           final extendCount = (machine['extendCount'] ?? 0) as int;
 
-          // endTime이 지났으면 USING이라도 수거대기로 간주
+          // endTime이 지났으면 USING -> 수거대기로 간주
           final bool expired =
               endTime != null && DateTime.now().isAfter(endTime);
           final String status =

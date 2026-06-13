@@ -284,7 +284,7 @@ class HomePage extends StatelessWidget {
 
                       const SizedBox(height: 24),
 
-                      // ── 사용 중 / 수거 대기 기기 실시간 모듈 (알림 자리) ──
+                      // -- 사용 중 / 수거 대기 기기 실시간 모듈 (알림 자리) --
                       // 사용 중인 기기가 없으면 자리째 접혀서 빈 여백이 안 생김
                       StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
@@ -547,8 +547,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ── 최근 이용 내역 아이템 (기기 정보 표시) ──
-// status 는 이미 _formatStatus() 로 변환된 값('진행' 등)을 받음
+// -- 최근 이용 내역 아이템 (기기 정보 표시) --
 class _UsageItemWithMachineInfo extends StatelessWidget {
   final String machineId;
   final String subtitle;
@@ -578,7 +577,6 @@ class _UsageItemWithMachineInfo extends StatelessWidget {
           isDryer = d['machineType'] == 'DRYER';
           final mType = isDryer ? '건조기' : '세탁기';
           final no = d['machineNo'] ?? '';
-          // floor가 없으면 '?층' 대신 생략
           final floorRaw = d['floor'];
           title = floorRaw != null
               ? '$mType · $floorRaw층 · $no번'
