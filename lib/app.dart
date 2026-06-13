@@ -12,6 +12,8 @@ import 'student_my_page.dart';
 import 'notification_page.dart';
 import 'refrigerator_camera_page.dart';
 import 'qr_scan_page.dart';
+import 'refrigerator_items_page.dart';
+import 'admin_refrigerator_items_page.dart';
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -34,6 +36,9 @@ class ShrineApp extends StatelessWidget {
         '/notificationPage': (context) => const NotificationPage(),
         '/refrigeratorCamera': (context) => const RefrigeratorCameraPage(),
         '/qrScan': (context) => const QRScanPage(),
+        '/refrigeratorItems': (context) => const RefrigeratorItemsPage(),
+        '/adminRefrigeratorItems': (context) =>
+            const AdminRefrigeratorItemsPage(),
       },
     );
   }

@@ -416,6 +416,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RefrigeratorCameraPage extends StatefulWidget {
   const RefrigeratorCameraPage({Key? key}) : super(key: key);
@@ -607,6 +608,25 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
     }
   }
 
+  Future<String> _uploadImage(String uid) async {
+    if (_imageBytes == null) return '';
+
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('refrigeratorItems')
+        .child(uid)
+        .child(fileName);
+
+    await ref.putData(
+      _imageBytes!,
+      SettableMetadata(contentType: 'image/jpeg'),
+    );
+
+    return await ref.getDownloadURL();
+  }
+
   Future<void> _registerItem() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -622,11 +642,12 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
     setState(() {
       _isSaving = true;
     });
-
+    // 사진 url 저장 변수
+    final imageUrl = await _uploadImage(user.uid);
     await FirebaseFirestore.instance.collection('refrigeratorItems').add({
       'userId': user.uid,
       'itemName': _itemName,
-      'imageUrl': '',
+      'imageUrl': imageUrl,
       'foodType': _foodType ?? 'FRESH',
       'storageType': _storageType,
       'status': 'ACTIVE',
@@ -739,6 +760,28 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
                   ],
                 ),
               ),
+            if (_itemName != null) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _storageButton(
+                      title: '통 안 보관',
+                      value: 'IN_CONTAINER',
+                      icon: Icons.kitchen_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _storageButton(
+                      title: '통 밖 보관',
+                      value: 'OUTSIDE_CONTAINER',
+                      icon: Icons.inventory_2_outlined,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -761,6 +804,46 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _storageButton({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    final selected = _storageType == value;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _storageType = value;
+        });
+      },
+      child: Container(
+        height: 76,
+        decoration: BoxDecoration(
+          color: selected ? Colors.black : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? Colors.black : Colors.grey.shade300,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
