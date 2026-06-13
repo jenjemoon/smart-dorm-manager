@@ -3,16 +3,23 @@ description: Learn the basics of using Material Components by building a simple 
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
-
 dependencies:
+  camera: ^0.11.0+2
+
+
   flutter:
     sdk: flutter
-  intl: ^0.17.0
+  intl: ^0.20.2
   firebase_auth: ^6.0.1
   google_sign_in: ^6.2.1
   cupertino_icons: ^1.0.5
   shrine_images: ^2.0.2
   cloud_firestore: ^6.0.0
+  image_picker: ^1.1.2
+  mobile_scanner: ^7.2.0
+  firebase_functions: ^0.6.0
+  http: ^1.2.2
+  firebase_storage: ^13.4.2
 
 dev_dependencies:
   flutter_test:

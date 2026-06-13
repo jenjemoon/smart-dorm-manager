@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 
-import 'my_page_wrapper.dart';
 import 'home.dart';
 import 'login.dart';
 import 'profile_setup_page.dart';
 import 'refrigerator_home_page.dart';
 import 'machine_home_page.dart';
 import 'machine_detail_page.dart';
-
+import 'admin_home_page.dart';
+import 'admin_my_page.dart';
+import 'student_my_page.dart';
+import 'notification_page.dart';
+import 'refrigerator_camera_page.dart';
+import 'qr_scan_page.dart';
+import 'refrigerator_items_page.dart';
+import 'admin_refrigerator_items_page.dart';
 
 class ShrineApp extends StatelessWidget {
   const ShrineApp({Key? key}) : super(key: key);
@@ -24,8 +30,15 @@ class ShrineApp extends StatelessWidget {
         '/refrigeratorHome': (context) => const RefrigeratorHomePage(),
         '/machineHome': (context) => const MachineHomePage(),
         '/machineDetail': (context) => const MachineDetailPage(),
-        '/myPage': (context) => const MyPageWrapper(),
-        
+        '/studentMy': (context) => const StudentMyPage(),
+        '/adminMy': (context) => const AdminMyPage(),
+        '/adminHome': (context) => const AdminHomePage(),
+        '/notificationPage': (context) => const NotificationPage(),
+        '/refrigeratorCamera': (context) => const RefrigeratorCameraPage(),
+        '/qrScan': (context) => const QRScanPage(),
+        '/refrigeratorItems': (context) => const RefrigeratorItemsPage(),
+        '/adminRefrigeratorItems': (context) =>
+            const AdminRefrigeratorItemsPage(),
       },
     );
   }
