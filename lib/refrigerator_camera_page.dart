@@ -416,6 +416,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:firebase_storage/firebase_storage.dart';
 
 class RefrigeratorCameraPage extends StatefulWidget {
   const RefrigeratorCameraPage({Key? key}) : super(key: key);
@@ -607,6 +608,25 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
     }
   }
 
+  Future<String> _uploadImage(String uid) async {
+    if (_imageBytes == null) return '';
+
+    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('refrigeratorItems')
+        .child(uid)
+        .child(fileName);
+
+    await ref.putData(
+      _imageBytes!,
+      SettableMetadata(contentType: 'image/jpeg'),
+    );
+
+    return await ref.getDownloadURL();
+  }
+
   Future<void> _registerItem() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -622,11 +642,12 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
     setState(() {
       _isSaving = true;
     });
-
+    // 사진 url 저장 변수
+    final imageUrl = await _uploadImage(user.uid);
     await FirebaseFirestore.instance.collection('refrigeratorItems').add({
       'userId': user.uid,
       'itemName': _itemName,
-      'imageUrl': '',
+      'imageUrl': imageUrl,
       'foodType': _foodType ?? 'FRESH',
       'storageType': _storageType,
       'status': 'ACTIVE',

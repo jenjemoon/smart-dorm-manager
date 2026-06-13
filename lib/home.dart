@@ -20,6 +20,65 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  // 냉장고 보관임박 푸시알림 (경빈)
+
+  Future<void> _checkFridgeExpiryNotifications(String uid) async {
+    final now = DateTime.now();
+
+    final items = await FirebaseFirestore.instance
+        .collection('refrigeratorItems')
+        .where('userId', isEqualTo: uid)
+        .where('status', isEqualTo: 'ACTIVE')
+        .get();
+
+    for (final doc in items.docs) {
+      final data = doc.data();
+
+      final itemName = data['itemName'] ?? '식품';
+      final recommendedExpireDate = data['recommendedExpireDate'];
+
+      if (recommendedExpireDate == null || recommendedExpireDate == '')
+        continue;
+
+      final parts = recommendedExpireDate.toString().split('.');
+      if (parts.length != 3) continue;
+
+      final expireDate = DateTime(
+        int.parse(parts[0]),
+        int.parse(parts[1]),
+        int.parse(parts[2]),
+      );
+
+      final daysLeft = expireDate.difference(now).inDays;
+
+      if (daysLeft <= 2 && daysLeft >= 0) {
+        final existing = await FirebaseFirestore.instance
+            .collection('notifications')
+            .where('userId', isEqualTo: uid)
+            .where('type', isEqualTo: 'FRIDGE')
+            .where('itemId', isEqualTo: doc.id)
+            .where('notificationType', isEqualTo: 'EXPIRE_SOON')
+            .get();
+
+        if (existing.docs.isEmpty) {
+          await FirebaseFirestore.instance.collection('notifications').add({
+            'userId': uid,
+            'itemId': doc.id,
+            'type': 'FRIDGE',
+            'notificationType': 'EXPIRE_SOON',
+            'message': '$itemName의 추천 수거일까지 $daysLeft일 남았습니다.',
+            'isRead': false,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
+      }
+    }
+    if (uid != null) {
+      Future.microtask(() => _checkFridgeExpiryNotifications(uid));
+    }
+  }
+
   void _showCameraModal(BuildContext context) {
     showModalBottomSheet(
       context: context,

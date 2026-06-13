@@ -167,7 +167,10 @@ class RefrigeratorHomePage extends StatelessWidget {
                                   title: '보관 제품',
                                   backgroundColor: Colors.black,
                                   textColor: Colors.white,
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                        context, '/refrigeratorItems');
+                                  },
                                 ),
                               ),
                             ],
