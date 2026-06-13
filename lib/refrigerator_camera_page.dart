@@ -508,41 +508,41 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
               'parts': [
                 {
                   'text': '''
-이 이미지를 보고 냉장고에 등록할 식품 정보를 JSON으로만 반환해줘.
+                    이 이미지를 보고 냉장고에 등록할 식품 정보를 JSON으로만 반환해줘.
 
-규칙:
+                    규칙:
 
-1. 식품이 과일, 채소 등 자연 상태의 신선식품이면
-- foodType은 "FRESH"로 해줘.
-- expireDate는 null로 해줘.
-- expireSource는 null로 해줘.
-- recommendedStorageDays는 일반적인 냉장 보관 기준으로 추천해줘.
+                    1. 식품이 과일, 채소 등 자연 상태의 신선식품이면
+                    - foodType은 "FRESH"로 해줘.
+                    - expireDate는 null로 해줘.
+                    - expireSource는 null로 해줘.
+                    - recommendedStorageDays는 일반적인 냉장 보관 기준으로 추천해줘.
 
-2. 식품이 유제품, 음료, 육가공품, 반찬류, 냉동식품 등 포장식품이면
-- foodType은 "PACKAGED"로 해줘.
-- 포장지에 실제 유통기한 날짜가 보이면 expireDate에 YYYY.MM.DD 형식으로 넣어줘.
-- 이 경우 expireSource는 "OCR"로 해줘.
-- 포장식품인데 유통기한이 보이지 않으면 expireDate는 null로 해줘.
-- 이 경우 expireSource는 "NEED_RETAKE"로 해줘.
-- recommendedStorageDays는 일반적인 냉장 보관 기준으로 추천해줘.
+                    2. 식품이 유제품, 음료, 육가공품, 반찬류, 냉동식품 등 포장식품이면
+                    - foodType은 "PACKAGED"로 해줘.
+                    - 포장지에 실제 유통기한 날짜가 보이면 expireDate에 YYYY.MM.DD 형식으로 넣어줘.
+                    - 이 경우 expireSource는 "OCR"로 해줘.
+                    - 포장식품인데 유통기한이 보이지 않으면 expireDate는 null로 해줘.
+                    - 이 경우 expireSource는 "NEED_RETAKE"로 해줘.
+                    - recommendedStorageDays는 일반적인 냉장 보관 기준으로 추천해줘.
 
-3. storageType 규칙
-- 냉장 보관이 적합하면 "IN_CONTAINER"
-- 실온 보관이 적합하면 "OUTSIDE_CONTAINER"
+                    3. storageType 규칙
+                    - 냉장 보관이 적합하면 "IN_CONTAINER"
+                    - 실온 보관이 적합하면 "OUTSIDE_CONTAINER"
 
-반드시 JSON만 반환하고 설명은 하지 마.
+                    반드시 JSON만 반환하고 설명은 하지 마.
 
-반드시 아래 형식을 사용해:
+                    반드시 아래 형식을 사용해:
 
-{
-  "itemName": "음식명",
-  "foodType": "FRESH 또는 PACKAGED",
-  "expireDate": null,
-  "expireSource": null,
-  "storageType": "IN_CONTAINER",
-  "recommendedStorageDays": 7
-}
-'''
+                    {
+                      "itemName": "음식명",
+                      "foodType": "FRESH 또는 PACKAGED",
+                      "expireDate": null,
+                      "expireSource": null,
+                      "storageType": "IN_CONTAINER",
+                      "recommendedStorageDays": 7
+                    }
+                    '''
                 },
                 {
                   'inline_data': {

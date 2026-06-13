@@ -105,6 +105,42 @@ class HomePage extends StatelessWidget {
             icon: const Icon(Icons.notifications_none, size: 30),
             onPressed: () => Navigator.pushNamed(context, '/notificationPage'),
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              final result = await showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('로그아웃'),
+                    content: const Text('정말 로그아웃 하시겠습니까?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('취소'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('로그아웃'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (result == true) {
+                await FirebaseAuth.instance.signOut();
+
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/login',
+                    (route) => false,
+                  );
+                }
+              }
+            },
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -310,9 +346,8 @@ class HomePage extends StatelessWidget {
                             return const SizedBox.shrink();
                           }
 
-                          final activeSession =
-                              activeSnapshot.data!.docs.first.data()
-                                  as Map<String, dynamic>;
+                          final activeSession = activeSnapshot.data!.docs.first
+                              .data() as Map<String, dynamic>;
                           final machineId = activeSession['machineId'] ?? '';
                           final endTime =
                               activeSession['endTime'] as Timestamp?;
@@ -373,8 +408,7 @@ class HomePage extends StatelessWidget {
                                       Container(
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          color:
-                                              Colors.white.withOpacity(0.2),
+                                          color: Colors.white.withOpacity(0.2),
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
@@ -488,10 +522,8 @@ class HomePage extends StatelessWidget {
                           }
 
                           return Column(
-                            children:
-                                sessionSnapshot.data!.docs.map((doc) {
-                              final data =
-                                  doc.data() as Map<String, dynamic>;
+                            children: sessionSnapshot.data!.docs.map((doc) {
+                              final data = doc.data() as Map<String, dynamic>;
                               final machineId = data['machineId'] ?? '';
                               final status = data['status'] ?? '';
                               final endTime = data['endTime'];
@@ -539,8 +571,8 @@ class HomePage extends StatelessWidget {
           Icon(icon, size: 28),
           const Spacer(),
           Text(title,
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold)),
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -578,9 +610,8 @@ class _UsageItemWithMachineInfo extends StatelessWidget {
           final mType = isDryer ? '건조기' : '세탁기';
           final no = d['machineNo'] ?? '';
           final floorRaw = d['floor'];
-          title = floorRaw != null
-              ? '$mType · $floorRaw층 · $no번'
-              : '$mType · $no번';
+          title =
+              floorRaw != null ? '$mType · $floorRaw층 · $no번' : '$mType · $no번';
         }
 
         return Padding(
@@ -611,8 +642,7 @@ class _UsageItemWithMachineInfo extends StatelessWidget {
                           fontSize: 15, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
-                    Text(subtitle,
-                        style: const TextStyle(color: Colors.grey)),
+                    Text(subtitle, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
               ),
