@@ -28,6 +28,7 @@ class RefrigeratorHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid;
+    //print('현재 로그인 uid: $uid');
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,7 +60,6 @@ class RefrigeratorHomePage extends StatelessWidget {
                   stream: FirebaseFirestore.instance
                       .collection('refrigeratorItems')
                       .where('userId', isEqualTo: uid)
-                      .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, itemSnapshot) {
                     final itemCount = itemSnapshot.hasData
