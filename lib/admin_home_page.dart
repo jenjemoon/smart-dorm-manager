@@ -165,7 +165,8 @@ class AdminHomePage extends StatelessWidget {
                         color: const Color(0xFF9BC3FF),
                         icon: Icons.kitchen_outlined,
                         onTap: () {
-                          Navigator.pushNamed(context, '/refrigeratorHome');
+                          Navigator.pushNamed(
+                              context, '/adminRefrigeratorItems');
                         },
                       ),
                       const SizedBox(height: 36),

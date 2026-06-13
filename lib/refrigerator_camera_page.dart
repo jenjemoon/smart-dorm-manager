@@ -760,6 +760,28 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
                   ],
                 ),
               ),
+            if (_itemName != null) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _storageButton(
+                      title: '통 안 보관',
+                      value: 'IN_CONTAINER',
+                      icon: Icons.kitchen_outlined,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _storageButton(
+                      title: '통 밖 보관',
+                      value: 'OUTSIDE_CONTAINER',
+                      icon: Icons.inventory_2_outlined,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
@@ -782,6 +804,46 @@ class _RefrigeratorCameraPageState extends State<RefrigeratorCameraPage> {
                   backgroundColor: Colors.black,
                   foregroundColor: Colors.white,
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _storageButton({
+    required String title,
+    required String value,
+    required IconData icon,
+  }) {
+    final selected = _storageType == value;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _storageType = value;
+        });
+      },
+      child: Container(
+        height: 76,
+        decoration: BoxDecoration(
+          color: selected ? Colors.black : Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? Colors.black : Colors.grey.shade300,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],

@@ -189,23 +189,6 @@ class RefrigeratorItemsPage extends StatelessWidget {
                                   child: const Text('꺼냈어요'),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    _updateStatus(
-                                      context: context,
-                                      itemId: doc.id,
-                                      status: 'DISCARDED',
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  child: const Text('폐기'),
-                                ),
-                              ),
                             ],
                           ),
                         ],

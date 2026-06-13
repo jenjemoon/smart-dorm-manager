@@ -60,6 +60,7 @@ class RefrigeratorHomePage extends StatelessWidget {
                   stream: FirebaseFirestore.instance
                       .collection('refrigeratorItems')
                       .where('userId', isEqualTo: uid)
+                      .where('status', isEqualTo: 'ACTIVE')
                       .snapshots(),
                   builder: (context, itemSnapshot) {
                     final itemCount = itemSnapshot.hasData
@@ -177,7 +178,7 @@ class RefrigeratorHomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 28),
                           const Text(
-                            '현재 내역',
+                            '수거 임박 아이템',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -193,29 +194,72 @@ class RefrigeratorHomePage extends StatelessWidget {
                               '등록된 냉장고 식품이 없습니다.',
                               style: TextStyle(color: Colors.grey),
                             )
-                          else
-                            Column(
-                              children: itemSnapshot.data!.docs.map((doc) {
-                                final data = doc.data() as Map<String, dynamic>;
+                          else ...[
+                            Builder(
+                              builder: (context) {
+                                final now = DateTime.now();
 
-                                final itemName = data['itemName'] == null ||
-                                        data['itemName'] == ''
-                                    ? '이름 없는 식품'
-                                    : data['itemName'];
+                                final soonItems =
+                                    itemSnapshot.data!.docs.where((doc) {
+                                  final data =
+                                      doc.data() as Map<String, dynamic>;
+                                  final dateText =
+                                      data['recommendedExpireDate'];
 
-                                final status = data['status'] ?? '';
-                                final storageType =
-                                    data['storageType'] ?? 'IN_CONTAINER';
+                                  if (dateText == null || dateText == '')
+                                    return false;
 
-                                return _historyItem(
-                                  title: itemName,
-                                  subtitle: storageType == 'OUTSIDE_CONTAINER'
-                                      ? '통 밖 보관'
-                                      : '통 안 보관',
-                                  status: _formatStatus(status),
+                                  final parts = dateText.toString().split('.');
+                                  if (parts.length != 3) return false;
+
+                                  final expireDate = DateTime(
+                                    int.parse(parts[0]),
+                                    int.parse(parts[1]),
+                                    int.parse(parts[2]),
+                                    23,
+                                    59,
+                                  );
+
+                                  final hoursLeft =
+                                      expireDate.difference(now).inHours;
+
+                                  return hoursLeft <= 48 && hoursLeft >= 0;
+                                }).toList();
+
+                                if (soonItems.isEmpty) {
+                                  return const Text(
+                                    '수거 임박 아이템이 없습니다.',
+                                    style: TextStyle(color: Colors.grey),
+                                  );
+                                }
+
+                                return Column(
+                                  children: soonItems.map((doc) {
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
+
+                                    final itemName = data['itemName'] == null ||
+                                            data['itemName'] == ''
+                                        ? '이름 없는 식품'
+                                        : data['itemName'];
+
+                                    final status = data['status'] ?? '';
+                                    final storageType =
+                                        data['storageType'] ?? 'IN_CONTAINER';
+
+                                    return _historyItem(
+                                      title: itemName,
+                                      subtitle:
+                                          storageType == 'OUTSIDE_CONTAINER'
+                                              ? '통 밖 보관'
+                                              : '통 안 보관',
+                                      status: _formatStatus(status),
+                                    );
+                                  }).toList(),
                                 );
-                              }).toList(),
+                              },
                             ),
+                          ]
                         ],
                       ),
                     );
