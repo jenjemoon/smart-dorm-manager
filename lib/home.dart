@@ -93,6 +93,63 @@ class HomePage extends StatelessWidget {
     }
   }
 
+  void _showCameraModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '기능 선택',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ListTile(
+                  leading: const Icon(Icons.qr_code_scanner),
+                  title: const Text('QR 인식'),
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    Navigator.pushNamed(
+                      context,
+                      '/qrScan',
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.kitchen_outlined),
+                  title: const Text('냉장고 식품 등록'),
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    Navigator.pushNamed(
+                      context,
+                      '/refrigeratorCamera',
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -161,7 +218,7 @@ class HomePage extends StatelessWidget {
               ),
               child: Center(
                 child: GestureDetector(
-                  //onTap: () => _showCameraModal(context),
+                  onTap: () => _showCameraModal(context),
                   child: Container(
                     width: 48,
                     height: 48,
