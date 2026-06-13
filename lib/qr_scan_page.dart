@@ -30,7 +30,7 @@ class _QRScanPageState extends State<QRScanPage> {
     }
   }
 
-  // laundryRoomId(숫자) -> floor 조회 (디테일 페이지와 동일한 방식)
+  // laundryRoomId(숫자) -> floor 조회
   Future<int?> _loadFloor(dynamic laundryRoomId) async {
     if (laundryRoomId == null) return null;
     final snap = await FirebaseFirestore.instance
@@ -77,7 +77,7 @@ class _QRScanPageState extends State<QRScanPage> {
     final floor = await _loadFloor(data['laundryRoomId']);
     if (!mounted) return;
 
-    // ── 종료 모드: 사용 종료 버튼 누르고 재태깅 ──
+    // --- 종료 모드: 사용 종료 버튼 누르고 재태깅 ---
     if (_isStopMode) {
       if (_expectedMachineId != null && code != _expectedMachineId) {
         if (!mounted) return;
@@ -91,7 +91,7 @@ class _QRScanPageState extends State<QRScanPage> {
       return;
     }
 
-    // ── 일반 스캔 모드 ──
+    // --- 일반 스캔 모드 --
     if (status == 'AVAILABLE') {
       // 사용 가능 → 시작 확인 바텀시트
       _showStartBottomSheet(code, data, floor);
@@ -110,7 +110,7 @@ class _QRScanPageState extends State<QRScanPage> {
     }
   }
 
-  // ── 사용 시작 바텀시트 ──
+  // --- 사용 시작 바텀시트 ---
   void _showStartBottomSheet(
       String machineId, Map<String, dynamic> data, int? floor) {
     final typeStr = data['machineType'] == 'DRYER' ? '건조기' : '세탁기';
@@ -171,7 +171,7 @@ class _QRScanPageState extends State<QRScanPage> {
     );
   }
 
-  // ── 사용 종료 바텀시트 (내가 사용 중일 때 재태깅) ──
+  // --- 사용 종료 바텀시트 (내가 사용 중일 때 재태깅) ---
   void _showStopBottomSheet(
       String machineId, Map<String, dynamic> data, int? floor) {
     final typeStr = data['machineType'] == 'DRYER' ? '건조기' : '세탁기';
@@ -232,7 +232,7 @@ class _QRScanPageState extends State<QRScanPage> {
     );
   }
 
-  // ── 시작 처리 ──
+  // --- 시작 처리 ---
   Future<void> _startMachine(String machineId, String machineType) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) return;
@@ -244,7 +244,7 @@ class _QRScanPageState extends State<QRScanPage> {
 
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
-    // ★ 기기 문서에도 시간 정보를 써줘야 디테일 페이지 카운트다운이 동작함
+    // 기기 문서에도 시간 정보 써줌 -> 디테일 페이지에서도 카운트다운 동작
     batch.update(machineRef, {
       'status': 'USING',
       'currentUserId': uid,
@@ -275,7 +275,7 @@ class _QRScanPageState extends State<QRScanPage> {
         arguments: {'machineId': machineId, 'machineType': machineType});
   }
 
-  // ── 종료 처리 ──
+  // --- 종료 처리 ---
   Future<void> _stopMachine(String machineId, String? uid) async {
     if (uid == null) return;
 
@@ -297,8 +297,9 @@ class _QRScanPageState extends State<QRScanPage> {
       });
     }
 
-    // 기기 AVAILABLE로 초기화 — ★ 시간 정보까지 깨끗이 지워야
-    // 다음 사용자(또는 같은 사용자)가 다시 50분부터 시작됨
+    // 기기 초기화
+    //시간 정보까지 깨끗이 지움 -> 다시 50분부터 시작
+
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
     batch.update(machineRef, {
