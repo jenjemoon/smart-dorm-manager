@@ -10,11 +10,11 @@ class MachineDetailPage extends StatefulWidget {
 }
 
 class _MachineDetailPageState extends State<MachineDetailPage> {
-  bool _waitingPersisted = false; // endTime 만료 시 WAITING 1회만 반영하기 위한 가드
+  bool _waitingPersisted = false; // endTime 만료 시 WAITING 1회만 반영하기 위해
 
   String _formatType(String? type) => type == 'DRYER' ? '건조기' : '세탁기';
 
-  // laundryRoomId(숫자) -> floor 조회용
+
   Future<int?> _loadFloor(dynamic laundryRoomId) async {
     if (laundryRoomId == null) return null;
     final snap = await FirebaseFirestore.instance
@@ -77,7 +77,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
           final bool isMine = currentUid != null && currentUid == currentUserId;
           final bool isAvailable = status == 'AVAILABLE';
 
-// [수정] 누구나 화면을 보면 시간이 만료됐을 때 WAITING 처리 및 수거 시작 시간 기록
+// 시간이 만료됐을 때 WAITING 처리 및 수거 시작 시간 기록
           if (rawStatus == 'USING' && expired && !_waitingPersisted) {
             _waitingPersisted = true;
             FirebaseFirestore.instance
@@ -94,7 +94,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
             _waitingPersisted = false; // 연장 등으로 다시 타이머가 진행되면 가드 해제
           }
 
-// [추가] WAITING(수거 대기) 상태인데 기록된 대기 시작 시각으로부터 10분이 지났는지 실시간 검사
+// WAITING(수거 대기) 상태에서 10분 초과됐는지 확인
           final Timestamp? waitingStartTimestamp =
               machine['waitingStartTime'] as Timestamp?;
           if (rawStatus == 'WAITING' && waitingStartTimestamp != null) {
@@ -103,7 +103,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
                 DateTime.now().difference(waitingStartTime).inMinutes >= 10;
 
             if (isOver10Minutes) {
-              // 10분이 넘었으므로 대기열을 회전시키는 비동기 함수 실행
+              // 10분이 넘었으므로 대기열 회전
               _rotateQueueToNextUser(machineId);
             }
           }
@@ -539,7 +539,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
     );
   }
 
-  // [새로 추가 2] 10분 미수거 시 대기열(machineQueues)의 다음 사람으로 기기 주인을 교체하는 핵심 함수
+  // 10분 미수거 시 대기열(machineQueues)의 다음 사람으로 교체하는 함수
   Future<void> _rotateQueueToNextUser(String machineId) async {
     final machineRef =
         FirebaseFirestore.instance.collection('machines').doc(machineId);
@@ -581,13 +581,13 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // 대기열 목록에서 이 사람의 상태를 완료(DONE)처리하여 대기자 큐에서 제외
+      // 대기열 목록에서 이 사람의 상태를 완료 처리해 큐에서 제외
       await firstQueueDoc.reference.update({
         'status': 'DONE',
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // 새 유저의 알림방(notifications)에 순번 도래 알림 자동 전송
+      // 새 유저의 알림방에 순번 도래 알림 자동 전송
       await FirebaseFirestore.instance.collection('notifications').add({
         'userId': nextUserId,
         'message':
@@ -601,8 +601,7 @@ class _MachineDetailPageState extends State<MachineDetailPage> {
       });
     }
   }
-} // 클래스 마지막
-
+} 
 // ---- 실시간 카운트다운 카드 ------------
 class _MachineInfoCard extends StatelessWidget {
   final String title;
